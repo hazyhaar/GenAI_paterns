@@ -61,19 +61,15 @@ An agent receiving "plan rate limiting in siftrag" reads `siftrag/CLAUDE.md` and
 
 ### The fix: protocol chaining
 
-Each local `CLAUDE.md` starts with 2 lines:
+Each local `CLAUDE.md` starts with 3 lines:
 
 ```markdown
 > **Protocol** — Before any task, read [`../CLAUDE.md`](../CLAUDE.md) §Research protocol.
 > Required commands: `cat <dir>/CLAUDE.md` → `grep -rn "CLAUDE:SUMMARY"` → `grep -n "CLAUDE:WARN" <file>`.
+> **Forbidden**: Glob/Read/Explore/find instead of `grep -rn`. Never read an entire file as first action.
 ```
 
-Three options were considered:
-1. **One-line link** — too passive, agents don't follow links reliably
-2. **Inline all 17 lines** — guaranteed but 204 duplicated lines across 12 files
-3. **3 key commands + link** — inlines the essential `grep` commands, links to root for the rest
-
-Option (c) was chosen. The 3 inlined commands are enough for the agent to start the protocol; the link provides the full context if needed.
+The third line is critical. Without it, agents acknowledge the protocol but still default to browsing (`find *.go` → `Read` every file). The explicit ban on their default tools forces them to actually use `grep`. Tested: removing this line causes agents to fall back to brute-force exploration even when the first two lines are present.
 
 ### A/B test results
 

@@ -105,9 +105,10 @@ Line 1 of every local CLAUDE.md:
 ```markdown
 > **Protocol** — Before any task, read [`../CLAUDE.md`](../CLAUDE.md) §Research protocol.
 > Required commands: `cat <dir>/CLAUDE.md` → `grep -rn "CLAUDE:SUMMARY"` → `grep -n "CLAUDE:WARN" <file>`.
+> **Forbidden**: Glob/Read/Explore/find instead of `grep -rn`. Never read an entire file as first action.
 ```
 
-For nested directories (e.g., `scripts/deploy/`), adjust the relative path: `../../CLAUDE.md`.
+The "Forbidden" line is essential — without it, agents acknowledge the grep commands but still default to browsing tools. For nested directories (e.g., `scripts/deploy/`), adjust the relative path: `../../CLAUDE.md`.
 
 ## INDEX.map
 

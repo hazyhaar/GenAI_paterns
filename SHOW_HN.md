@@ -13,7 +13,13 @@ The annotations are plain Go comments. No tooling dependency, no build step. `gr
 
 **The hidden problem — agents don't inherit context.** Claude Code injects the root CLAUDE.md into the main conversation, but sub-agents (launched via the Agent tool) start blank. They only see their prompt + whatever they choose to read. An agent receiving "plan X in siftrag" reads `siftrag/CLAUDE.md` but never goes up to root. It misses the research protocol, INDEX.map, the architecture schemas. It dives into source like the documentation doesn't exist.
 
-**The fix for the fix**: each local CLAUDE.md now starts with 2 lines pointing back to root — the 3 essential `grep` commands inlined + a link to the full protocol. Three options were considered: (a) one-line link (too passive), (b) inline all 17 lines of the protocol (204 duplicated lines), (c) 3 key commands + link. We picked (c).
+**The fix for the fix**: each local CLAUDE.md now starts with 3 lines — the mandatory `grep` commands, a link to the full protocol, and critically, an explicit **ban** on the tools agents default to (`Glob`, `Read`, `Explore`, `find`). Without the ban line, agents acknowledge the protocol but still fall back to browsing. With it, they use `grep` as intended.
+
+```markdown
+> **Protocol** — Before any task, read [`../CLAUDE.md`](../CLAUDE.md) §Research protocol.
+> Required commands: `cat <dir>/CLAUDE.md` → `grep -rn "CLAUDE:SUMMARY"` → `grep -n "CLAUDE:WARN" <file>`.
+> **Forbidden**: Glob/Read/Explore/find instead of `grep -rn`. Never read an entire file as first action.
+```
 
 **A/B test**: same prompt ("audit sherpapi integration in siftrag"), same codebase, fresh terminal. Two runs:
 
