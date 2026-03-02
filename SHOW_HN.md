@@ -31,4 +31,4 @@ The root CLAUDE.md isn't just a navigation protocol — it's the architectural c
 
 **What's in the repo**: the skill file (generic template), a sample audit report, the annotation format spec. MIT licensed.
 
-Repo: https://github.com/hazyhaar/claude-doc-audit
+
