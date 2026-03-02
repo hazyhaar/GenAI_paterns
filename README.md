@@ -1,6 +1,6 @@
-# claude-doc-audit
+# Don't smoke tokens, grep content
 
-A structured prompt ("skill file") that turns a codebase into a self-documenting system for AI agents. No tooling, no build step — just Go comments and markdown manifests scannable by `grep`.
+Two structured prompts ("skill files") that turn a codebase into a self-documenting system for AI agents. No tooling, no build step — just Go comments, ASCII schemas, and markdown manifests scannable by `grep`.
 
 ## The problem
 
@@ -48,6 +48,40 @@ func (r *Router) Close() error {
 ```
 
 `grep CLAUDE:WARN connectivity/router.go` gives you every trap without reading the file.
+
+## Skill 2 — Schematics (ASCII architecture diagrams)
+
+A second skill generates `*_schem.md` files — ASCII art technical schemas for every service and package. Where Skill 1 produces scannable annotations in source files, Skill 2 produces visual architecture documentation that replaces reading the source entirely.
+
+### What it produces
+
+Each schema documents in ASCII art:
+- Architecture and dispatch logic
+- Data flow diagrams
+- SQL DDL (the actual CREATE TABLE statements)
+- Transport factories and protocol details
+- Middleware chains and state machines
+- Core types and key function signatures
+
+### Example
+
+A 14-file router package (1800+ lines of Go) gets a [214-line ASCII schema](example-schem.md) covering the dispatch logic, hot-reload loop, transport factories, circuit breaker, and middleware chain. An agent reads this one file instead of opening 14 source files.
+
+### Session stats
+
+One run of the schematics skill: **112K tokens, 7 minutes**. Rewrote the ecosystem schema (300 lines) and corrected 4 local schemas (renamed tables, fixed column names, updated template references).
+
+## The final state: minimal CLAUDE.md + grepped content
+
+After both skills, an agent working on any service sees 3 layers:
+
+| Layer | Format | Size | Purpose |
+|-------|--------|------|---------|
+| `CLAUDE.md` | Markdown manifest | ~50 lines | Responsibility, deps, invariants, traps |
+| `*_schem.md` | ASCII art | ~200 lines | Architecture, SQL schema, data flow |
+| `CLAUDE:SUMMARY` + `CLAUDE:WARN` | Go comments (grep) | 1 line each | File index + function traps |
+
+The agent's workflow becomes: `cat CLAUDE.md` → `grep SUMMARY` → `grep WARN` → read 20 targeted lines. No browsing, no `find`, no "let me explore the codebase."
 
 ## The chaining problem
 
@@ -135,8 +169,9 @@ The root CLAUDE.md isn't just navigation — it provides the architectural conte
 
 | File | Description |
 |------|-------------|
-| [`skill-codebase-audit.md`](skill-codebase-audit.md) | The skill file template (generic, ready to use) |
-| [`example-report.md`](example-report.md) | Anonymized audit report from a real run |
+| [`skill-codebase-audit.md`](skill-codebase-audit.md) | Skill 1 — annotation audit template (generic, ready to use) |
+| [`example-report.md`](example-report.md) | Anonymized audit report from a real Skill 1 run |
+| [`example-schem.md`](example-schem.md) | Anonymized ASCII schema from a real Skill 2 run (router package) |
 | [`annotation-format.md`](annotation-format.md) | Specification of the annotation format |
 | [`SHOW_HN.md`](SHOW_HN.md) | The Hacker News post |
 
