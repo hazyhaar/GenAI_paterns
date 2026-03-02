@@ -170,6 +170,7 @@ The root CLAUDE.md isn't just navigation — it provides the architectural conte
 | File | Description |
 |------|-------------|
 | [`skill-codebase-audit.md`](skill-codebase-audit.md) | Skill 1 — annotation audit template (generic, ready to use) |
+| [`skill-schematics.md`](skill-schematics.md) | Skill 2 — ASCII technical schema generation template |
 | [`example-report.md`](example-report.md) | Anonymized audit report from a real Skill 1 run |
 | [`example-schem.md`](example-schem.md) | Anonymized ASCII schema from a real Skill 2 run (router package) |
 | [`annotation-format.md`](annotation-format.md) | Specification of the annotation format |
