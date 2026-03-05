@@ -36,39 +36,40 @@ A WARN is NOT: a TODO, an optimization idea, a godoc comment, a rephrasing of wh
 
 ### Phase 1 — Inventory
 
-```bash
-# List active directories
-grep -n "│" CLAUDE.md | head -30
+```
+# Discover active directories dynamically
+Glob "**/go.mod"   # all Go modules in the monorepo
+# Exclude: archives/, dead code dirs
 
 # For each active directory:
-grep -rn "CLAUDE:SUMMARY" --include="*.go" <dir>/
+Read <dir>/CLAUDE.md
+Grep "CLAUDE:SUMMARY" <dir>/ --include="*.go"
 ```
 
 Identify gaps: `.go` files without SUMMARY.
 
-```bash
-# Go files (non-test, non-generated) without annotation
-find <dir> -name "*.go" ! -name "*_test.go" ! -name "*.pb.go" ! -name "*_templ.go" | while read f; do
-  grep -q "CLAUDE:SUMMARY" "$f" || echo "MISSING: $f"
-done
+```
+# Go files (non-test, non-generated)
+Glob "<dir>/**/*.go"  # exclude *_test.go, *.pb.go, *_templ.go
+# Compare with Grep "CLAUDE:SUMMARY" results to find gaps
 ```
 
 ### Phase 2 — File-head annotations
 
 For each file without SUMMARY or with stale SUMMARY:
 
-1. `grep -n "^func " <file>` — list public functions
-2. `head -10 <file>` — see imports and package
+1. `Grep "^func " <file>` — list public functions
+2. `Read <file> [1, 10]` — see imports and package
 3. Write the SUMMARY + DEPENDS + EXPORTS block
 
 Rules:
 - SUMMARY = one sentence, not two. Starts with a verb or noun.
 - DEPENDS = local imports (not stdlib, not third-party). Path relative to module.
-- EXPORTS = public names actually used by other packages. Not everything exported — what's imported. When in doubt: `grep -rn "PublicName" --include="*.go" ../ | grep -v <current_dir>`.
+- EXPORTS = public names actually used by other packages. Not everything exported — what's imported. When in doubt: `Grep "PublicName" ../ --include="*.go"` excluding current dir.
 
 ### Phase 3 — WARN per function
 
-For each file, `grep -n "^func " <file>` then read each function.
+For each file, `Grep "^func " <file>` then read each function.
 
 Add a WARN above if the function:
 - Takes a lock (mu.Lock, mu.RLock, rebuildMu)
@@ -84,7 +85,7 @@ Do NOT add a WARN if the function is a pure getter, a side-effect-free helper, o
 ### Phase 4 — Local CLAUDE.md
 
 Check each active directory's `CLAUDE.md`:
-- Are the listed invariants still true? (`grep -rn` to verify)
+- Are the listed invariants still true? (`Grep` to verify)
 - Is there a trap discovered during phases 2-3 that's missing?
 - Is the build/test still correct? (`make test` if Makefile present)
 - Do the listed dependencies match the `CLAUDE:DEPENDS`?
@@ -103,9 +104,10 @@ The documentation system has a defined format. Content outside the format isn't 
 - `// CLAUDE:EXPORTS` — one per file, after DEPENDS
 - `// CLAUDE:WARN` — above a function, never at file head
 
-```bash
+```
 # Find any non-standard CLAUDE: annotation
-grep -rn "CLAUDE:" --include="*.go" <dir>/ | grep -v "CLAUDE:SUMMARY\|CLAUDE:DEPENDS\|CLAUDE:EXPORTS\|CLAUDE:WARN"
+Grep "CLAUDE:" <dir>/ --include="*.go"
+# Filter out CLAUDE:SUMMARY, CLAUDE:DEPENDS, CLAUDE:EXPORTS, CLAUDE:WARN
 ```
 
 For each result:
@@ -130,7 +132,7 @@ For each out-of-section content:
 **Credentials and secrets** — mandatory check before any commit:
 
 ```bash
-# Tokens, keys, passwords in documentation and source files
+# Tokens, keys, passwords in documentation and source files — keep as Bash (complex pipe)
 grep -rn "Bearer \|sk-\|password\|secret\|token\|api.key\|JWT_SECRET\|SMTP_PASSWORD" --include="*.md" --include="*.go" <dir>/ | grep -vi "variable\|example\|documentation\|placeholder\|change-me" | grep -v "_test.go"
 ```
 

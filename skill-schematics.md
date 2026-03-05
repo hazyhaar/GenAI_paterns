@@ -177,42 +177,42 @@ After each diagram, count the characters of the first and last line of each bloc
 
 ### New schema
 
-1. `cat <dir>/CLAUDE.md` — understand role and dependencies
-2. `grep -rn "CLAUDE:SUMMARY" --include="*.go" <dir>/` — file inventory
-3. `grep -rn "CLAUDE:EXPORTS" --include="*.go" <dir>/` — public API
-4. `grep -rn "CLAUDE:DEPENDS" --include="*.go" <dir>/` — dependency graph
-5. If persistence: `cat <dir>/schema.sql` or `grep -n "CREATE TABLE" --include="*.go" <dir>/`
+1. `Read <dir>/CLAUDE.md` — understand role and dependencies
+2. `Grep "CLAUDE:SUMMARY" <dir>/ --include="*.go"` — file inventory
+3. `Grep "CLAUDE:EXPORTS" <dir>/ --include="*.go"` — public API
+4. `Grep "CLAUDE:DEPENDS" <dir>/ --include="*.go"` — dependency graph
+5. If persistence: `Read <dir>/schema.sql` or `Grep "CREATE TABLE" <dir>/ --include="*.go"`
 6. Write the schema section by section, in the order defined above
 7. Verify each assertion (verification phase below)
 
 ### Updating existing schema
 
-1. `grep -rn "CLAUDE:SUMMARY" --include="*.go" <dir>/` — compare with schema's file tree
+1. `Grep "CLAUDE:SUMMARY" <dir>/ --include="*.go"` — compare with schema's file tree
 2. Files added/removed? → update section 2
-3. Public types changed? `grep -rn "CLAUDE:EXPORTS"` → update section 6
+3. Public types changed? `Grep "CLAUDE:EXPORTS" <dir>/ --include="*.go"` → update section 6
 4. SQL tables changed? → update section 4
 5. New connections between components? → update section 3
 6. Verify ASCII alignment of each modified block
 
 ## Verification
 
-Every fact in the schema must be verifiable by grep. Before finalizing:
+Every fact in the schema must be verifiable. Before finalizing:
 
-```bash
+```
 # Every file listed in the tree exists
-ls <dir>/file.go
+Glob "<dir>/file.go"
 
 # Every table listed exists in the DDL
-grep -c "CREATE TABLE table_name" <dir>/schema.sql
+Grep "CREATE TABLE table_name" <dir>/schema.sql
 
 # Every public type listed is actually exported
-grep -n "^type TypeName struct" --include="*.go" <dir>/
+Grep "^type TypeName struct" <dir>/ --include="*.go"
 
 # Every arrow A → B corresponds to a real import or call
-grep -rn "import.*packageB\|packageB\." --include="*.go" <dir_of_A>/
+Grep "packageB" <dir_of_A>/ --include="*.go"
 
 # Every table column matches the actual DDL
-# (read the CREATE TABLE and compare column by column)
+# (Read the CREATE TABLE and compare column by column)
 ```
 
 A schema with an arrow that doesn't correspond to any import is worse than a schema without the arrow. Don't invent. If the connection isn't verifiable, don't draw it.

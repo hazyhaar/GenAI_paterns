@@ -81,7 +81,7 @@ After both skills, an agent working on any service sees 3 layers:
 | `*_schem.md` | ASCII art | ~200 lines | Architecture, SQL schema, data flow |
 | `CLAUDE:SUMMARY` + `CLAUDE:WARN` | Go comments (grep) | 1 line each | File index + function traps |
 
-The agent's workflow becomes: `cat CLAUDE.md` → `grep SUMMARY` → `grep WARN` → read 20 targeted lines. No browsing, no `find`, no "let me explore the codebase."
+The agent's workflow becomes: `Read CLAUDE.md` → `Grep SUMMARY` → `Grep WARN` → read 20 targeted lines. No browsing, no `find`, no "let me explore the codebase."
 
 ## The chaining problem
 
@@ -99,11 +99,11 @@ Each local `CLAUDE.md` starts with 3 lines:
 
 ```markdown
 > **Protocol** — Before any task, read [`../CLAUDE.md`](../CLAUDE.md) §Research protocol.
-> Required commands: `cat <dir>/CLAUDE.md` → `grep -rn "CLAUDE:SUMMARY"` → `grep -n "CLAUDE:WARN" <file>`.
-> **Forbidden**: Glob/Read/Explore/find instead of `grep -rn`. Never read an entire file as first action.
+> Required commands: `Read <dir>/CLAUDE.md` → `Grep "CLAUDE:SUMMARY"` → `Grep "CLAUDE:WARN" <file>`.
+> **Forbidden**: Bash(grep/cat/find) instead of Grep/Read. Never read an entire file as first action.
 ```
 
-The third line is critical. Without it, agents acknowledge the protocol but still default to browsing (`find *.go` → `Read` every file). The explicit ban on their default tools forces them to actually use `grep`. Tested: removing this line causes agents to fall back to brute-force exploration even when the first two lines are present.
+The third line is critical. Without it, agents acknowledge the protocol but still default to browsing (`find *.go` → `Read` every file). The explicit ban on Bash fallbacks forces them to use the dedicated tools (Grep, Read, Glob) which are auto-approved and require no permission prompts. Tested: removing this line causes agents to fall back to brute-force exploration even when the first two lines are present.
 
 ### A/B test results
 

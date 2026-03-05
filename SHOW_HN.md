@@ -39,8 +39,8 @@ Fix: each local CLAUDE.md starts with 3 lines — the mandatory `grep` commands 
 
 ```markdown
 > **Protocol** — Before any task, read [`../CLAUDE.md`](../CLAUDE.md) §Research protocol.
-> Required commands: `cat <dir>/CLAUDE.md` → `grep -rn "CLAUDE:SUMMARY"` → `grep -n "CLAUDE:WARN" <file>`.
-> **Forbidden**: Glob/Read/Explore/find instead of `grep -rn`. Never read an entire file as first action.
+> Required commands: `Read <dir>/CLAUDE.md` → `Grep "CLAUDE:SUMMARY"` → `Grep "CLAUDE:WARN" <file>`.
+> **Forbidden**: Bash(grep/cat/find) instead of Grep/Read. Never read an entire file as first action.
 ```
 
 ## A/B test
